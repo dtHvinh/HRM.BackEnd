@@ -1,16 +1,14 @@
 using BackEnd.Data;
-using BackEnd.Extensions;
+using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddOpenApi();
+builder.Services.AddFastEndpoints();
 
 builder.Services
-    .AddDbContext<ApplicationDbContext>(options =>
-    {
-        options.UseNpgsql(builder.Configuration.GetConnectionString("Default"));
-    });
+    .AddDbContext<ApplicationDbContext>(options => { options.UseNpgsql(builder.Configuration.GetConnectionString("Default")); });
 
 builder.Services.AddCors(options =>
 {
@@ -18,19 +16,31 @@ builder.Services.AddCors(options =>
                       policy =>
                       {
                           policy.WithOrigins(
-                              "https://localhost:7052",
-                              "http://192.168.1.3",
-                              "https://192.168.1.3",
-                              "http://localhost:7051",
-                              "https://qa-web-mu.vercel.app",
-                              "https://qa-web-dthvinhs-projects.vercel.app",
-                              "https://qa-2vvl99o65-dthvinhs-projects.vercel.app");
-                          policy.AllowAnyHeader();
+                              "http://localhost:3000");
                           policy.SetIsOriginAllowed(origin => true);
+                          policy.AllowAnyHeader();
                           policy.AllowAnyMethod();
                           policy.AllowCredentials();
                       });
 });
+
+//builder.Services
+//    .AddAuthentication(options =>
+//{
+//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+//})
+//    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+//    {
+//        options.TokenValidationParameters = new()
+//        {
+//            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["SecretKey"]!)),
+//            ClockSkew = TimeSpan.Zero
+//        };
+//    });
+
+//builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -39,7 +49,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseDefaultExceptionHandler().UseFastEndpoints(c =>
+{
+    c.Endpoints.RoutePrefix = "api";
+    c.Serializer.Options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
 app.UseHttpsRedirection();
-app.UseEndpoints();
 app.UseCors("AllowOrigins");
 app.Run();

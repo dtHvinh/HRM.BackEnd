@@ -1,0 +1,17 @@
+meta {
+  name: Add
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/provinces
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "An Giang"
+  }
+}
