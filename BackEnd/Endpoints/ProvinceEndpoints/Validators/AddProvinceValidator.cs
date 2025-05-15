@@ -4,9 +4,9 @@ using FluentValidation;
 
 namespace BackEnd.Endpoints.ProvinceEndpoints.Validators;
 
-public class AddProvinceValidator : Validator<AddProvinceRequest>
+public class AddAccountValidator : Validator<AddProvinceRequest>
 {
-    public AddProvinceValidator()
+    public AddAccountValidator()
     {
         RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
     }

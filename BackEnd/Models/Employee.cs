@@ -12,6 +12,9 @@ public class Employee
     public Gender Gender { get; set; }
     public required string Email { get; set; }
     public required string Phone { get; set; }
+
+    public EmployeeAddress? EmployeeAddress { get; set; }
+    public ICollection<EmployeeDepartment>? EmployeeDepartments { get; set; }
 }
 
 public enum Gender

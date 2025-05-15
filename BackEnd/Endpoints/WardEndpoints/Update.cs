@@ -4,7 +4,7 @@ using FastEndpoints;
 
 namespace BackEnd.Endpoints.WardEndpoints;
 
-public record UpdateWardRequest(int Id, string Name);
+public record UpdateWardRequest(int Id, string WardName);
 
 public class Update(ApplicationDbContext context) : Endpoint<UpdateWardRequest>
 {
@@ -26,7 +26,7 @@ public class Update(ApplicationDbContext context) : Endpoint<UpdateWardRequest>
             return;
         }
 
-        ward.WardName = req.Name;
+        ward.WardName = req.WardName;
         await _context.SaveChangesAsync(ct);
 
         await SendOkAsync(ct);

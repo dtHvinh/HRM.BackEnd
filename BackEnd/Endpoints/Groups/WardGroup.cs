@@ -8,7 +8,6 @@ public class WardGroup : Group
     {
         Configure("wards", cf =>
         {
-            cf.AllowAnonymous();
         });
     }
 }

@@ -8,7 +8,6 @@ public class ProvinceGroup : Group
     {
         Configure("provinces", cf =>
         {
-            cf.AllowAnonymous();
         });
     }
 }

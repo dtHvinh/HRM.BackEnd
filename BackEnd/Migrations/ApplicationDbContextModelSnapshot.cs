@@ -77,6 +77,9 @@ namespace BackEnd.Migrations
 
                     b.HasKey("DepartmentId");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Departments");
                 });
 

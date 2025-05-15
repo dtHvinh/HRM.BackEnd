@@ -24,4 +24,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<EmployeeDepartment> EmployeeDepartments { get; set; }
     public DbSet<EmployeeNotification> EmployeeNotifications { get; set; }
     public DbSet<EmployeeSalary> EmployeeSalaries { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<EmployeeAddress>().Navigation(e => e.Province).AutoInclude();
+        modelBuilder.Entity<EmployeeAddress>().Navigation(e => e.Ward).AutoInclude();
+    }
 }
