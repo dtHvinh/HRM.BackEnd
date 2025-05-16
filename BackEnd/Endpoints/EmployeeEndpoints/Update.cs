@@ -6,19 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Endpoints.EmployeeEndpoints;
 
-public record UpdateEmployeeRequest
-{
-    public int Id { get; init; }
-    public required string FullName { get; init; }
-    public required string DateOfBirth { get; init; }
-    public required string Gender { get; init; }
-    public required string Email { get; init; }
-    public required string Phone { get; init; }
-    public required string Department { get; init; }
-    public required string Position { get; init; }
-    public required string ProvinceId { get; init; }
-    public required string WardId { get; init; }
-}
+public record UpdateEmployeeRequest(int Id, string FullName, string Dob, string Gender, string Email, string Phone, string Department, string Position, string ProvinceId, string WardId);
 
 public class Update(ApplicationDbContext context) : Endpoint<UpdateEmployeeRequest>
 {
@@ -41,52 +29,52 @@ public class Update(ApplicationDbContext context) : Endpoint<UpdateEmployeeReque
         }
 
         // Update employee basic information
-        employee.FullName = req.FullName;
-        employee.DOB = DateTimeOffset.Parse(req.DateOfBirth);
-        employee.Gender = Enum.Parse<Gender>(req.Gender);
-        employee.Email = req.Email;
-        employee.Phone = req.Phone;
+        if (!string.IsNullOrEmpty(req.FullName))
+            employee.FullName = req.FullName;
+
+        if (!string.IsNullOrEmpty(req.Dob))
+            employee.DOB = DateTimeOffset.Parse(req.Dob);
+
+        if (!string.IsNullOrEmpty(req.Gender))
+            employee.Gender = Enum.Parse<Gender>(req.Gender);
+
+        if (!string.IsNullOrEmpty(req.Email))
+            employee.Email = req.Email;
+
+        if (!string.IsNullOrEmpty(req.Phone))
+            employee.Phone = req.Phone;
 
         // Update department relationship
-        if (int.TryParse(req.Department, out int departmentId))
+        if (int.TryParse(req.Department, out int departmentId) && departmentId != default)
         {
             var employeeDepartment = await _context.EmployeeDepartments
                 .FirstOrDefaultAsync(ed => ed.EmployeeId == req.Id, ct);
 
-            if (employeeDepartment != null)
+            _context.EmployeeDepartments.Add(new EmployeeDepartment
             {
-                employeeDepartment.DepartmentId = departmentId;
-            }
-            else
-            {
-                _context.EmployeeDepartments.Add(new EmployeeDepartment
-                {
-                    EmployeeId = req.Id,
-                    DepartmentId = departmentId
-                });
-            }
+                EmployeeId = req.Id,
+                DepartmentId = departmentId
+            });
         }
 
         // Update address information
-        if (int.TryParse(req.ProvinceId, out int provinceId) && int.TryParse(req.WardId, out int wardId))
+        if (int.TryParse(req.ProvinceId, out int provinceId) && int.TryParse(req.WardId, out int wardId)
+            && provinceId != default && wardId != default)
         {
             var employeeAddress = await _context.EmployeeAddresses
                 .FirstOrDefaultAsync(ea => ea.EmployeeId == req.Id, ct);
 
             if (employeeAddress != null)
             {
-                employeeAddress.ProvinceId = provinceId;
-                employeeAddress.WardId = wardId;
+                _context.EmployeeAddresses.Remove(employeeAddress);
             }
-            else
+
+            _context.EmployeeAddresses.Add(new EmployeeAddress
             {
-                _context.EmployeeAddresses.Add(new EmployeeAddress
-                {
-                    EmployeeId = req.Id,
-                    ProvinceId = provinceId,
-                    WardId = wardId
-                });
-            }
+                EmployeeId = req.Id,
+                ProvinceId = provinceId,
+                WardId = wardId
+            });
         }
 
         await _context.SaveChangesAsync(ct);

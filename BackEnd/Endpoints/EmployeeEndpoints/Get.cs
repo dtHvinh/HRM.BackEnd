@@ -2,6 +2,7 @@ using BackEnd.Data;
 using BackEnd.Endpoints.EmployeeEndpoints.DTOs;
 using BackEnd.Endpoints.EmployeeEndpoints.Mapper;
 using BackEnd.Endpoints.Groups;
+using BackEnd.Models;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,51 +20,35 @@ public class Get(ApplicationDbContext context) : EndpointWithoutRequest<List<Get
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var employeesWithRelations = await _context.Employees
-            .OrderBy(e => e.EmployeeId)
-            .Select(e => new
-            {
-                Employee = e,
-                Department = _context.EmployeeDepartments
-                    .Where(ed => ed.EmployeeId == e.EmployeeId)
-                    .OrderByDescending(ed => ed.AppointmentDate)
-                    .Join(_context.Departments,
-                        ed => ed.DepartmentId,
-                        d => d.DepartmentId,
-                        (ed, d) => d.Name)
-                    .FirstOrDefault() ?? "",
-                Position = _context.EmployeeDepartments
-                    .Where(ed => ed.EmployeeId == e.EmployeeId)
-                    .OrderByDescending(ed => ed.AppointmentDate)
-                    .Join(_context.Positions,
-                        ed => ed.PositionId,
-                        p => p.PositionId,
-                        (ed, p) => p.Name)
-                    .FirstOrDefault() ?? "",
-                Province = _context.EmployeeAddresses
-                    .Where(ea => ea.EmployeeId == e.EmployeeId)
-                    .Join(_context.Province,
-                        ea => ea.ProvinceId,
-                        p => p.ProvinceId,
-                        (ea, p) => p.ProvinceName)
-                    .FirstOrDefault() ?? "",
-                Ward = _context.EmployeeAddresses
-                    .Where(ea => ea.EmployeeId == e.EmployeeId)
-                    .Join(_context.Wards,
-                        ea => ea.WardId,
-                        w => w.WardId,
-                        (ea, w) => w.WardName)
-                    .FirstOrDefault() ?? ""
-            })
-            .ToListAsync(ct);
+        var departmentFilter = Query<int>("dep", false);
+        var genderFilter = Query<int>("gen", false);
+        var provinceFilter = Query<int>("province", false);
+        var wardFilter = Query<int>("ward", false);
 
-        var result = employeesWithRelations.Select(e => e.Employee.ToGetEmployeeDTO(
-            e.Department,
-            e.Position,
-            e.Province,
-            e.Ward
-        )).ToList();
+        var query = _context.Employees
+            .Include(e => e.EmployeeDepartments)
+            .Include(e => e.EmployeeAddress)
+            .Where(e => true);
 
+        if (departmentFilter != 0)
+            query = query
+                 .Where(e => e.EmployeeDepartments!
+                     .OrderByDescending(e => e.AppointmentDate).First()!.Department!.DepartmentId == departmentFilter);
+
+        if (genderFilter != 0)
+            query = query.Where(e => e.Gender == Enum.GetValues<Gender>()[genderFilter - 1]);
+
+        if (provinceFilter != 0)
+            query = query.Where(e => e.EmployeeAddress!.Province!.ProvinceId == provinceFilter);
+
+        if (wardFilter != 0)
+            query = query.Where(e => e.EmployeeAddress!.Ward!.WardId == wardFilter);
+
+        var result = await query.Select(e => e.ToGetEmployeeDTO(
+                e.EmployeeDepartments!.OrderByDescending(e => e.AppointmentDate).First()!.Department!.Name,
+                e.EmployeeDepartments!.OrderByDescending(e => e.AppointmentDate).First()!.Position!.Name,
+                e.EmployeeAddress!.Province!.ProvinceName,
+                e.EmployeeAddress!.Ward!.WardName)).ToListAsync(ct);
 
         await SendAsync(result, cancellation: ct);
     }

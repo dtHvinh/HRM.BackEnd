@@ -29,5 +29,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         modelBuilder.Entity<EmployeeAddress>().Navigation(e => e.Province).AutoInclude();
         modelBuilder.Entity<EmployeeAddress>().Navigation(e => e.Ward).AutoInclude();
+
+        modelBuilder.Entity<EmployeeDepartment>().Navigation(e => e.Position).AutoInclude();
+        modelBuilder.Entity<EmployeeDepartment>().Navigation(e => e.Department).AutoInclude();
     }
 }

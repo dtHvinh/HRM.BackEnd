@@ -13,4 +13,8 @@ public class EmployeeDepartment
     public DateTimeOffset TransferInDate { get; set; }
     public DateTimeOffset TransferOutDate { get; set; }
     public DateTimeOffset AppointmentDate { get; set; }
+
+    public Employee? Employee { get; set; }
+    public Department? Department { get; set; }
+    public Position? Position { get; set; }
 }
