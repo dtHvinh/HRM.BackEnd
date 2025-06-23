@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
 	<MapperlyAbstractionsScope>runtime</MapperlyAbstractionsScope>
 	<DefineConstants>$(DefineConstants);MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME</DefineConstants>
+	<UserSecretsId>9cbedf42-23d0-46ea-9eb3-ce1ffca5fd4f</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

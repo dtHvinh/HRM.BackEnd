@@ -5,7 +5,7 @@ using FastEndpoints;
 
 namespace BackEnd.Endpoints.AccountEndpoints;
 
-public record AddAccountRequest(string Username, string Password);
+public record AddAccountRequest(string Username, string Password, bool IsAdmin);
 
 public class Add(ApplicationDbContext context) : Endpoint<AddAccountRequest>
 {
@@ -22,7 +22,8 @@ public class Add(ApplicationDbContext context) : Endpoint<AddAccountRequest>
         var account = new Account
         {
             Username = req.Username,
-            Password = req.Password
+            Password = req.Password,
+            IsAdmin = req.IsAdmin
         };
 
         _context.Accounts.Add(account);

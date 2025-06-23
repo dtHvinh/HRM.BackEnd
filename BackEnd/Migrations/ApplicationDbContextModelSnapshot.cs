@@ -30,6 +30,9 @@ namespace BackEnd.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AccountId"));
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
@@ -59,6 +62,9 @@ namespace BackEnd.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("AllowanceId");
+
+                    b.HasIndex("AllowanceName")
+                        .IsUnique();
 
                     b.ToTable("Allowances");
                 });
@@ -127,6 +133,13 @@ namespace BackEnd.Migrations
 
                     b.HasKey("EmployeeId", "ProvinceId", "WardId");
 
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
+
+                    b.HasIndex("ProvinceId");
+
+                    b.HasIndex("WardId");
+
                     b.ToTable("EmployeeAddresses");
                 });
 
@@ -145,6 +158,13 @@ namespace BackEnd.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("EmployeeId", "AllowanceId", "InsuranceId");
+
+                    b.HasIndex("AllowanceId");
+
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
+
+                    b.HasIndex("InsuranceId");
 
                     b.ToTable("EmployeeBenefits");
                 });
@@ -171,6 +191,10 @@ namespace BackEnd.Migrations
 
                     b.HasKey("EmployeeId", "DepartmentId", "PositionId");
 
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("PositionId");
+
                     b.ToTable("EmployeeDepartments");
                 });
 
@@ -187,6 +211,8 @@ namespace BackEnd.Migrations
 
                     b.HasKey("EmployeeId", "NotificationId");
 
+                    b.HasIndex("NotificationId");
+
                     b.ToTable("EmployeeNotifications");
                 });
 
@@ -202,6 +228,8 @@ namespace BackEnd.Migrations
                         .HasColumnType("date");
 
                     b.HasKey("EmployeeId", "SalaryId");
+
+                    b.HasIndex("SalaryId");
 
                     b.ToTable("EmployeeSalaries");
                 });
@@ -222,6 +250,9 @@ namespace BackEnd.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("InsuranceId");
+
+                    b.HasIndex("InsuranceName")
+                        .IsUnique();
 
                     b.ToTable("Insurances");
                 });
@@ -314,6 +345,136 @@ namespace BackEnd.Migrations
                         .IsUnique();
 
                     b.ToTable("Wards");
+                });
+
+            modelBuilder.Entity("BackEnd.Models.EmployeeAddress", b =>
+                {
+                    b.HasOne("BackEnd.Models.Employee", "Employee")
+                        .WithOne("EmployeeAddress")
+                        .HasForeignKey("BackEnd.Models.EmployeeAddress", "EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd.Models.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd.Models.Ward", "Ward")
+                        .WithMany()
+                        .HasForeignKey("WardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Province");
+
+                    b.Navigation("Ward");
+                });
+
+            modelBuilder.Entity("BackEnd.Models.EmployeeBenefit", b =>
+                {
+                    b.HasOne("BackEnd.Models.Allowance", "Allowance")
+                        .WithMany()
+                        .HasForeignKey("AllowanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd.Models.Employee", "Employee")
+                        .WithOne("EmployeeBenefit")
+                        .HasForeignKey("BackEnd.Models.EmployeeBenefit", "EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd.Models.Insurance", "Insurance")
+                        .WithMany()
+                        .HasForeignKey("InsuranceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Allowance");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Insurance");
+                });
+
+            modelBuilder.Entity("BackEnd.Models.EmployeeDepartment", b =>
+                {
+                    b.HasOne("BackEnd.Models.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd.Models.Employee", "Employee")
+                        .WithMany("EmployeeDepartments")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd.Models.Position", "Position")
+                        .WithMany()
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Position");
+                });
+
+            modelBuilder.Entity("BackEnd.Models.EmployeeNotification", b =>
+                {
+                    b.HasOne("BackEnd.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd.Models.Notification", "Notification")
+                        .WithMany()
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Notification");
+                });
+
+            modelBuilder.Entity("BackEnd.Models.EmployeeSalary", b =>
+                {
+                    b.HasOne("BackEnd.Models.Employee", "Employee")
+                        .WithMany("EmployeeSalaries")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackEnd.Models.Salary", "Salary")
+                        .WithMany()
+                        .HasForeignKey("SalaryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Salary");
+                });
+
+            modelBuilder.Entity("BackEnd.Models.Employee", b =>
+                {
+                    b.Navigation("EmployeeAddress");
+
+                    b.Navigation("EmployeeBenefit");
+
+                    b.Navigation("EmployeeDepartments");
+
+                    b.Navigation("EmployeeSalaries");
                 });
 #pragma warning restore 612, 618
         }

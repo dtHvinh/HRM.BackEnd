@@ -3,7 +3,6 @@ using BackEnd.Endpoints.Groups;
 using BackEnd.Extensions;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace BackEnd.Endpoints.AuthEndpoints;
 
@@ -32,7 +31,7 @@ public class Login(ApplicationDbContext dbContext) : Endpoint<LoginRequest, Logi
         }
         else
         {
-            var token = Config["SecretKey"]!.GenerateToken();
+            var token = Config["SecretKey"]!.GenerateToken(account.AccountId);
             var response = new LoginResponse(token);
             await SendOkAsync(response, cancellation: ct);
         }

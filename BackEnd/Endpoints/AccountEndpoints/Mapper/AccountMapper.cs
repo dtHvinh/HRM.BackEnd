@@ -8,4 +8,5 @@ namespace BackEnd.Endpoints.AccountEndpoints.Mapper;
 public static partial class AccountMapper
 {
     public static partial GetAccountDTO ToGetAccountDTO(this Account account);
+    public static partial GetInfoDTO ToGetInfoDTO(this Account account);
 }

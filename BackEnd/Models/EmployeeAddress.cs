@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 
 namespace BackEnd.Models;
 
 [Table("EmployeeAddresses")]
 [PrimaryKey(nameof(EmployeeId), nameof(ProvinceId), nameof(WardId))]
+[DebuggerDisplay("EmployeeId: {EmployeeId}")]
 public class EmployeeAddress
 {
     public int ProvinceId { get; set; }

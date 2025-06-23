@@ -11,4 +11,9 @@ public class EmployeeBenefit
     public int AllowanceId { get; set; }
     public int InsuranceId { get; set; }
     public DateTimeOffset JoinedDate { get; set; }
+
+    public Employee Employee { get; set; } = default!;
+    public Allowance Allowance { get; set; } = default!;
+    public Insurance Insurance { get; set; } = default!;
+
 }

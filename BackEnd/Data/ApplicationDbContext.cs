@@ -30,7 +30,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<EmployeeAddress>().Navigation(e => e.Province).AutoInclude();
         modelBuilder.Entity<EmployeeAddress>().Navigation(e => e.Ward).AutoInclude();
 
+        modelBuilder.Entity<EmployeeBenefit>().Navigation(e => e.Insurance).AutoInclude();
+        modelBuilder.Entity<EmployeeBenefit>().Navigation(e => e.Allowance).AutoInclude();
+
         modelBuilder.Entity<EmployeeDepartment>().Navigation(e => e.Position).AutoInclude();
         modelBuilder.Entity<EmployeeDepartment>().Navigation(e => e.Department).AutoInclude();
+
+        modelBuilder.Entity<EmployeeSalary>().Navigation(e => e.Salary).AutoInclude();
+
+        modelBuilder.Entity<EmployeeNotification>().Navigation(e => e.Notification).AutoInclude();
+        modelBuilder.Entity<EmployeeNotification>().Navigation(e => e.Employee).AutoInclude();
     }
 }

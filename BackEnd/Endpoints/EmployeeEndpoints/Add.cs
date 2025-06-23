@@ -18,7 +18,7 @@ public class Add(ApplicationDbContext context) : Endpoint<AddEmployeeDTO>
 
     public override async Task HandleAsync(AddEmployeeDTO req, CancellationToken ct)
     {
-        DateTimeOffset dob = DateTimeOffset.Parse(req.DateOfBirth);
+        DateTimeOffset dob = DateTimeOffset.Parse(req.Dob);
 
         Gender gender = Enum.Parse<Gender>(req.Gender);
 
@@ -28,19 +28,19 @@ public class Add(ApplicationDbContext context) : Endpoint<AddEmployeeDTO>
             DOB = dob,
             Gender = gender,
             Email = req.Email,
-            Phone = req.Phone
+            Phone = req.Phone,
         };
 
         _context.Employees.Add(employee);
         await _context.SaveChangesAsync(ct);
 
-        if (int.TryParse(req.Department, out int departmentId))
+        if (int.TryParse(req.DepartmentId, out int departmentId))
         {
             var employeeDepartment = new EmployeeDepartment
             {
                 EmployeeId = employee.EmployeeId,
                 DepartmentId = departmentId,
-                PositionId = int.Parse(req.Position),
+                PositionId = int.Parse(req.PositionId),
                 TransferInDate = DateTimeOffset.UtcNow,
                 AppointmentDate = DateTimeOffset.UtcNow
             };

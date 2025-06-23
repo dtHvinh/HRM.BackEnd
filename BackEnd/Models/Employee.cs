@@ -14,6 +14,8 @@ public class Employee
     public required string Phone { get; set; }
 
     public EmployeeAddress? EmployeeAddress { get; set; }
+    public EmployeeBenefit? EmployeeBenefit { get; set; }
+    public ICollection<EmployeeSalary>? EmployeeSalaries { get; set; }
     public ICollection<EmployeeDepartment>? EmployeeDepartments { get; set; }
 }
 

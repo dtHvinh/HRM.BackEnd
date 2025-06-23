@@ -38,7 +38,7 @@ public class GetEmployee(ApplicationDbContext context) : Endpoint<GetEmployeeReq
             employee.EmployeeDepartments!.OrderByDescending(e => e.AppointmentDate).First()!.Position!.Name,
             employee.EmployeeAddress!.Province!.ProvinceName,
             employee.EmployeeAddress!.Ward!.WardName,
-            employee.EmployeeDepartments!.OrderByDescending(e => e.TransferInDate).Select(
+            [.. employee.EmployeeDepartments!.OrderByDescending(e => e.TransferInDate).Select(
                 ed => new DepartmetHistory(
                     ed.Department!.DepartmentId,
                     ed.Department.Name,
@@ -46,6 +46,6 @@ public class GetEmployee(ApplicationDbContext context) : Endpoint<GetEmployeeReq
                     ed.TransferOutDate == DateTimeOffset.MinValue ? null : ed.TransferOutDate,
                     ed.AppointmentDate,
                     ed.Position!.Name)
-                ).ToList()), ct);
+            )]), ct);
     }
 }

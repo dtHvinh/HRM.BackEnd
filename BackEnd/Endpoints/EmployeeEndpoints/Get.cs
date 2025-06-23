@@ -15,6 +15,7 @@ public class Get(ApplicationDbContext context) : EndpointWithoutRequest<List<Get
     public override void Configure()
     {
         Get("");
+        AllowAnonymous();
         Group<EmployeeGroup>();
     }
 
@@ -24,8 +25,12 @@ public class Get(ApplicationDbContext context) : EndpointWithoutRequest<List<Get
         var genderFilter = Query<int>("gen", false);
         var provinceFilter = Query<int>("province", false);
         var wardFilter = Query<int>("ward", false);
+        var nameFilter = Query<string>("name", false);
+        var page = Query<int>("page", false);
+        var pageSize = Query<int>("pageSize", false);
 
         var query = _context.Employees
+            .OrderBy(e => e.EmployeeId)
             .Include(e => e.EmployeeDepartments)
             .Include(e => e.EmployeeAddress)
             .Where(e => true);
@@ -35,6 +40,9 @@ public class Get(ApplicationDbContext context) : EndpointWithoutRequest<List<Get
                  .Where(e => e.EmployeeDepartments!
                      .OrderByDescending(e => e.AppointmentDate).First()!.Department!.DepartmentId == departmentFilter);
 
+        if (!string.IsNullOrEmpty(nameFilter))
+            query = query.Where(e => e.FullName.Contains(nameFilter));
+
         if (genderFilter != 0)
             query = query.Where(e => e.Gender == Enum.GetValues<Gender>()[genderFilter - 1]);
 
@@ -43,6 +51,9 @@ public class Get(ApplicationDbContext context) : EndpointWithoutRequest<List<Get
 
         if (wardFilter != 0)
             query = query.Where(e => e.EmployeeAddress!.Ward!.WardId == wardFilter);
+
+        if (page != 0 && pageSize != 0)
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
         var result = await query.Select(e => e.ToGetEmployeeDTO(
                 e.EmployeeDepartments!.OrderByDescending(e => e.AppointmentDate).First()!.Department!.Name,

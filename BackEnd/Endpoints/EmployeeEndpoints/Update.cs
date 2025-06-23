@@ -62,7 +62,8 @@ public class Update(ApplicationDbContext context) : Endpoint<UpdateEmployeeReque
             && provinceId != default && wardId != default)
         {
             var employeeAddress = await _context.EmployeeAddresses
-                .FirstOrDefaultAsync(ea => ea.EmployeeId == req.Id, ct);
+                .IgnoreAutoIncludes()
+                .Where(ea => ea.EmployeeId == req.Id).FirstOrDefaultAsync(ct);
 
             if (employeeAddress != null)
             {

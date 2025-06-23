@@ -14,6 +14,7 @@ public class Get(ApplicationDbContext context) : EndpointWithoutRequest<List<Get
     public override void Configure()
     {
         Get("");
+        AllowAnonymous();
         Group<DepartmentGroup>();
     }
 
